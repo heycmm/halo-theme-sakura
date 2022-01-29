@@ -55,17 +55,47 @@
         <#include "layouts/authorprofile.ftl">
     </main><!-- #main -->
 </div><!-- #primary -->
-<script type="text/javascript">
+<#include "footer.ftl">
+<@footer />
+<script defer="defer" type="text/javascript">
+let video;
+function formatTime(seconds) {
+    var minutes = Math.floor(seconds / 60),
+        seconds = Math.floor(seconds - (minutes * 60));
+
+    return ('0' + minutes).substr(-2) + ':' + ('0' + seconds).substr(-2);
+}
+
+function renderProgressBar() {
+
+    var s = '',
+        l = 15,
+        p = Math.floor(video.currentTime / video.duration * (l - 1)),
+        i;
+
+    for (i = 0; i < l; i++) {
+        if (i === p) s += '◯';
+        else if (i < p) s += '─';
+        else s += '┄';
+    }
+
+    location.hash = '╭' + s + '╮' + formatTime(video.currentTime) + '╱' + formatTime(video.duration);
+}
+function renderEnded(){
+    window.location.hash = "";
+    // history.replaceState(null,'',location.pathname+location.search);
+}
 (function () {
     try {
         var    videos = document.getElementsByTagName('video');
         //console.log('12'+videos);
         if(""!=videos&&videos.length>0){
             const players = Array.from(videos).map(p => new Plyr(p));
+            video = videos[0];
+            video.addEventListener('timeupdate', renderProgressBar);
+            video.addEventListener('ended', renderEnded);
         }
     } catch (e) {
     }
 })();
 </script>
-<#include "footer.ftl">
-<@footer />

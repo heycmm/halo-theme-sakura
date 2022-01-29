@@ -315,32 +315,9 @@ var categoryRadar = {
 </@categoryTag>
 }
 let timeid;
-let video;
-function formatTime(seconds) {
-	var minutes = Math.floor(seconds / 60),
-			seconds = Math.floor(seconds - (minutes * 60));
-
-	return ('0' + minutes).substr(-2) + ':' + ('0' + seconds).substr(-2);
-}
-
-function renderProgressBar() {
-
-	var s = '',
-			l = 15,
-			p = Math.floor(video.currentTime / video.duration * (l - 1)),
-			i;
-
-	for (i = 0; i < l; i++) {
-		if (i === p) s += '◯';
-		else if (i < p) s += '─';
-		else s += '┄';
-	}
-
-	location.hash = '╭' + s + '╮' + formatTime(video.currentTime) + '╱' + formatTime(video.duration);
-}
 function loop() {
 	var i, n, s = '';
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i &lt; 10; i++) {
 		n = Math.floor(Math.sin((Date.now() / 200) + (i / 2)) * 4) + 4;
 		s += String.fromCharCode(0x2581 + n);
 	}
@@ -348,28 +325,13 @@ function loop() {
 	timeid = setTimeout(loop, 50);
 }
 
-function loopController(state) {
-	if (state === '2') {
+function loopController() {
 		clearTimeout(timeid)
 		window.location.hash = "";
-		// history.replaceState(null,'',location.pathname+location.search);
-	}
-}
-function renderEnded(){
-	window.location.hash = "";
-	// history.replaceState(null,'',location.pathname+location.search);
 }
 
 (function () {
 	try {
-		var    videos = document.getElementsByTagName('video');
-		//console.log('12'+videos);
-		if(""!=videos&&videos.length>0){
-			const players = Array.from(videos).map(p => new Plyr(p));
-			video = videos[0];
-			video.addEventListener('timeupdate', renderProgressBar);
-			video.addEventListener('ended', renderEnded);
-		}
 		$.getJSON("https://api.heycmm.cn/music/heycmmAll", (data) => {
 			const ap = new APlayer({
 				container: document.getElementById("aplayer"),
@@ -384,21 +346,17 @@ function renderEnded(){
 				audio: data
 			});
 			ap.lrc.hide();
-			loopController("2");
+			loopController();
 			ap.on('play', function () {
 				console.log('play start');
 				ap.lrc.show();
-				if(""=== videos || videos.length === 0){
-					loop();
-				}
+				loop();
 
 			});
 			ap.on('pause', function () {
 				console.log('play stop');
 				ap.lrc.hide();
-				if(""=== videos || videos.length === 0){
-					loopController("2");
-				}
+				loopController();
 			});
 		});
 	} catch (e) {
