@@ -19,6 +19,8 @@
 	<link rel="stylesheet" href="//at.alicdn.com/t/font_2010950_sh9o0r7ahar.css" media="noexist" onload="this.media='all'">
 	<link rel="stylesheet" href="${res_base_url!}/source/css/lib.css" media="noexist" onload="this.media='all'">
 	<link rel='stylesheet' href="${res_base_url!}/source/css/highlight/highlight-${settings.code_pretty!'Default'}.css" type="text/css" media="noexist" onload="this.media='all'">
+	<link href="${theme_base!}/js/plyr.css" type="text/css" rel="stylesheet" />
+	<link rel="stylesheet" href="${res_base_url!}/source/lib/APlayer/APlayer.min.css" media='all'>
 	<#if settings.is_aplayer!false>
 	<link rel="stylesheet" href="${res_base_url!}/source/lib/APlayer/APlayer.min.css" media='all'>
 	</#if>
@@ -35,6 +37,8 @@
 		}
 	</script>
 </head>
+<script type="text/javascript" charset="utf-8" src="${theme_base!}/js/banweixin.js?v=2333233"></script>
+<!--<script type="text/javascript" charset="utf-8" src="${theme_base!}/js/yinghua.js?v=2333233"></script>-->
 <body class="hfeed chinese-font serif">
 <section id="main-container">
     <#if settings.head_focus!true>

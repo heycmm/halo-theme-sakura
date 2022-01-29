@@ -164,6 +164,7 @@
 <#if settings.is_aplayer && settings.aplayer_float>
 <div id="aplayer-float" style="z-index: 100;" class="aplayer" data-global="true" data-id="${settings.aplayer_id!'2345868969'}" data-server="${settings.aplayer_server!'netease'}" data-type="${settings.aplayer_type!'playlist'}" data-fixed="true" data-preload="${settings.aplayer_preload!'none'}" data-order="${settings.aplayer_order!'list'}" data-theme="${settings.aplayer_theme!'orange'}" data-autoplay="${(settings.aplayer_autoplay!false)?string('true', 'false')}"></div>
 </#if>
+<div id="aplayer"></div>
 <!-- aplayer end -->
 <!-- theme-change start -->
 <#if settings.theme_change!true>
@@ -270,6 +271,8 @@
 <script type='text/javascript' src='${res_base_url!}/source/lib/packery-mode.pkgd.min/index.js' async></script>
 </#if>
 </#if>
+<script type="text/javascript" src="${theme_base!}/js/plyr.js"></script>
+<script type="text/javascript" src="${res_base_url!}/source/lib/APlayer/APlayer.min.js"></script>
 <script type="text/javascript" src="${res_base_url!}/source/js/highlight/highlight.pack.js" defer></script>
 <#if settings.code_line!true>
 	<script type="text/javascript" src="${res_base_url!}/source/js/highlight/highlightjs-line-numbers.min.js" defer></script>
@@ -296,20 +299,154 @@
 </#if>
 <#if settings.category_radar!true>
 <script src="${res_base_url!}/source/js/echarts/echarts.min.js" defer></script>
+<script type="text/javascript" charset="utf-8" src="${theme_base!}/js/snowflakes.min.js?v=2333233"></script>
 <script type='text/javascript'>
-	var categoryRadar = {
-		<@categoryTag method="list">
+var sf = new Snowflakes({
+	color: "#ffffff",
+	count: 20,
+	minSize: 5,
+	maxSize: 15
+});
+var categoryRadar = {
+<@categoryTag method="list">
 		<#list categories as category>
-		'${category.name!}': '${category.postCount!}',
-		</#list>
-		</@categoryTag>
+'${category.name!}': '${category.postCount!}',
+</#list>
+</@categoryTag>
+}
+let timeid;
+let video;
+function formatTime(seconds) {
+	var minutes = Math.floor(seconds / 60),
+			seconds = Math.floor(seconds - (minutes * 60));
+
+	return ('0' + minutes).substr(-2) + ':' + ('0' + seconds).substr(-2);
+}
+
+function renderProgressBar() {
+
+	var s = '',
+			l = 15,
+			p = Math.floor(video.currentTime / video.duration * (l - 1)),
+			i;
+
+	for (i = 0; i < l; i++) {
+		if (i === p) s += '◯';
+		else if (i < p) s += '─';
+		else s += '┄';
 	}
+
+	location.hash = '╭' + s + '╮' + formatTime(video.currentTime) + '╱' + formatTime(video.duration);
+}
+function loop() {
+	var i, n, s = '';
+	for (i = 0; i < 10; i++) {
+		n = Math.floor(Math.sin((Date.now() / 200) + (i / 2)) * 4) + 4;
+		s += String.fromCharCode(0x2581 + n);
+	}
+	window.location.hash = s;
+	timeid = setTimeout(loop, 50);
+}
+
+function loopController(state) {
+	if (state === '2') {
+		clearTimeout(timeid)
+		window.location.hash = "";
+		// history.replaceState(null,'',location.pathname+location.search);
+	}
+}
+function renderEnded(){
+	window.location.hash = "";
+	// history.replaceState(null,'',location.pathname+location.search);
+}
+
+(function () {
+	try {
+		var    videos = document.getElementsByTagName('video');
+		//console.log('12'+videos);
+		if(""!=videos&&videos.length>0){
+			const players = Array.from(videos).map(p => new Plyr(p));
+			video = videos[0];
+			video.addEventListener('timeupdate', renderProgressBar);
+			video.addEventListener('ended', renderEnded);
+		}
+		$.getJSON("https://api.heycmm.cn/music/heycmmAll", (data) => {
+			const ap = new APlayer({
+				container: document.getElementById("aplayer"),
+				fixed: true,
+				lrcType: 3,
+				preload: "auto",
+				//   order: "random",
+				listFolded: true,
+				listMaxHeight: "165px",
+				theme: "#e9e9e9",
+				volume: 0.9,
+				audio: data
+			});
+			ap.lrc.hide();
+			loopController("2");
+			ap.on('play', function () {
+				console.log('play start');
+				ap.lrc.show();
+				if(""=== videos || videos.length === 0){
+					loop();
+				}
+
+			});
+			ap.on('pause', function () {
+				console.log('play stop');
+				ap.lrc.hide();
+				if(""=== videos || videos.length === 0){
+					loopController("2");
+				}
+			});
+		});
+	} catch (e) {
+	}
+})();
 </script>
 </#if>
 <script type='text/javascript' src='${res_base_url!}/source/js/qrcode.min.js' defer></script>
 <script type='text/javascript' src='${res_base_url!}/source/lib/flv.min/index.js' defer></script>
 <script type='text/javascript' src='${res_base_url!}/script/i18n.min.js?ver=1.3.3' defer></script>
 <script type='text/javascript' src='${theme_base!}/script/app.min.js?ver=1.3.3'></script>
+<script type='text/javascript'>
+/**
+ * 神兽庇佑，万码朝宗
+ */
+var noattack = '　　　　　　　┏┓　　　┏┓+ +\n'
+		+'　　　　　　┏┛┻━━━┛┻┓ + +\n'
+		+'　　　　　　┃　　　　　　　┃\n'
+		+'　　　　　　┃　　　━　　　┃ ++ + + +\n'
+		+'　　　　　 ████━████ ┃+\n'
+		+'　　　　　　┃　　　　　　　┃ +\n'
+		+'　　　　　　┃　　　┻　　　┃\n'
+		+'　　　　　　┃　　　　　　　┃ + +\n'
+		+'　　　　　　┗━┓　　　┏━┛\n'
+		+'　　　　　　　　┃　　　┃\n'
+		+'　　　　　　　　┃　　　┃ + + + +\n'
+		+'　　　　　　　　┃　　　┃　　　　Mythical animals bless, website no attack\n'
+		+'　　　　　　　　┃　　　┃ + 　　　　神兽保佑,网站无攻击\n'
+		+'　　　　　　　　┃　　　┃\n'
+		+'　　　　　　　　┃　　　┃　　+\n'
+		+'　　　　　　　　┃　 　　┗━━━┓ + +\n'
+		+'　　　　　　　　┃ 　　　　　　　┣┓\n'
+		+'　　　　　　　　┃ 　　　　　　　┏┛\n'
+		+'　　　　　　　　┗┓┓┏━┳┓┏┛ + + + +\n'
+		+'　　　　　　　　　┃┫┫　┃┫┫\n'
+		+'　　　　　　　　　┗┻┛　┗┻┛+ + + +';
+console.clear();
+
+console.log('%c' + noattack, "color:orange");
+console.log("%c+",
+		`font-size: 1px;
+  padding: 122px 187px;
+  background-image: url(https://www.heycmm.cn/upload/2019/3/%E6%89%AB%E7%A0%81_%E6%90%9C%E7%B4%A2%E8%81%94%E5%90%88%E4%BC%A0%E6%92%AD%E6%A0%B7%E5%BC%8F-%E6%A0%87%E5%87%86%E8%89%B2%E7%89%8820190403100100544.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  color: transparent;`);
+
+</script>
 <#nested />
 <#if settings.live2d_switch!true>
 <script src="${res_base_url!}/source/lib/jquery-ui/jquery-ui.min.js" async defer></script>

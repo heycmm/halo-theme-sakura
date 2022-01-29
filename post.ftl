@@ -55,5 +55,17 @@
         <#include "layouts/authorprofile.ftl">
     </main><!-- #main -->
 </div><!-- #primary -->
+<script type="text/javascript">
+(function () {
+    try {
+        var    videos = document.getElementsByTagName('video');
+        //console.log('12'+videos);
+        if(""!=videos&&videos.length>0){
+            const players = Array.from(videos).map(p => new Plyr(p));
+        }
+    } catch (e) {
+    }
+})();
+</script>
 <#include "footer.ftl">
 <@footer />
